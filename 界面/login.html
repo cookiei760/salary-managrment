@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>人力资源系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局重置，确保没有默认边距影响 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* 登录页面容器 */
+        #loginBox {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* 登录容器 */
+        .login-container{
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+            padding: 50px 40px;
+            transform: translateY(0);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            animation: loginFadeIn 1s ease-out;
+            --login-width: 90%;
+            --login-max-width: 500px;
+            --login-min-width: 300px;
+            width: var(--login-width) !important;
+            max-width: var(--login-max-width) !important;
+            min-width: var(--login-min-width) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* 其他原有样式 */
+        body{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #bbdefb, #90caf9, #42a5f5, #1e88e5);
+            background-size: 400% 400%;
+            min-height: 100vh;
+            animation: gradientBG 15s ease infinite;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 登录页动态装饰元素 */
+        .login-decoration {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            filter: blur(80px);
+            z-index: 0;
+        }
+        
+        .decoration-1 {
+            top: -150px;
+            left: -150px;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        .decoration-2 {
+            bottom: -150px;
+            right: -150px;
+            animation: float 20s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        
+        .login-header{
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .login-header h2{
+            color: #1565c0;
+            font-size: 32px;
+            margin-bottom: 12px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .login-header h2:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 10%;
+            width: 80%;
+            height: 4px;
+            background: linear-gradient(90deg, #64b5f6, #1565c0);
+            border-radius: 3px;
+            animation: headerLine 2s ease-out;
+        }
+        
+        @keyframes headerLine {
+            from { width: 0; left: 50%; }
+            to { width: 80%; left: 10%; }
+        }
+        
+        .login-header p{
+            color: #546e7a;
+            font-size: 16px;
+        }
+        
+        /* 登录表单元素 */
+        .form-group{
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1565c0;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .form-group input{
+            width: 100%;
+            padding: 15px 18px;
+            background: #f8fafc;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            font-size: 18px;
+            color: #1e293b;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #42a5f5;
+            box-shadow: 0 0 0 4px rgba(66, 165, 245, 0.2);
+        }
+        
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .login-button{
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #64b5f6, #1565c0);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 18px rgba(66, 165, 245, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .login-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .login-button:hover:before {
+            left: 100%;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(66, 165, 245, 0.4);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .error-message{
+            color: #e74c3c;
+            font-size: 16px;
+            margin-top: 15px;
+            text-align: center;
+            min-height: 20px;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        /* 系统主体样式 */
+        :root {
+            --sidebar-start: #64b5f6;
+            --sidebar-end: #1565c0;
+            --sidebar-hover: #90caf9;
+            --accent: #1565c0;
+            --main-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --table-header: #1565c0; /* 修改为纯色背景 */
+            --table-row-hover: #f0f7ff;
+            --table-border: #e3f2fd;
+        }
+        
+        #mainBox {
+            background: var(--main-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            width: 100%;
+            display: none;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, var(--sidebar-start), var(--sidebar-end));
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+            .sidebar-toggle {
+                display: block;
+                background: transparent;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none;
+            }
+        }
+        
+        .header:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #64b5f6, #1565c0, #64b5f6);
+            background-size: 200% auto;
+            animation: gradientShift 5s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 62px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--sidebar-start), var(--sidebar-end));
+            padding: 20px 0;
+            box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 62px);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: transform 0.3s ease, width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 62px;
+                height: calc(100vh - 62px);
+                transform: translateX(-100%);
+                width: 220px;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .sidebar-mask {
+                position: fixed;
+                top: 62px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 62px);
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 90;
+                display: none;
+            }
+            .sidebar-mask.active {
+                display: block;
+            }
+        }
+        
+        .sidebar-item {
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            box-sizing: border-box;
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-item:before {
+            content: '';
+            margin-right: 10px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding-left: 25px;
+        }
+        
+        .sidebar-item:hover:before {
+            background-color: white;
+            transform: scale(1.3);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-item.active:before {
+            background-color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--main-bg);
+            box-sizing: border-box;
+            overflow-y: auto;
+            max-height: calc(100vh - 62px);
+            scrollbar-width: thin;
+            scrollbar-color: #64b5f6 #f0f7ff;
+        }
+        
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .main-content::-webkit-scrollbar-track {
+            background: #f0f7ff;
+            border-radius: 4px;
+        }
+        
+        .main-content::-webkit-scrollbar-thumb {
+            background-color: #64b5f6;
+            border-radius: 4px;
+        }
+        
+        .module {
+            display: none;
+            background-color: var(--main-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .module.active {
+            display: block;
+            transform: translateY(0);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .module h2 {
+            color: #1565c0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #64b5f6;
+            position: relative;
+            font-size: 20px;
+        }
+        
+        .module h2:after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background: #64b5f6;
+            bottom: -2px;
+            left: 0;
+        }
+        
+        .function-card {
+            background-color: #f8fafc;
+            padding: 20px;
+            margin: 12px 0 20px;
+            border-radius: 8px;
+            border-left: 4px solid #64b5f6;
+            box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .function-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .function-card h3 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .function-card h3:before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: #64b5f6;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .function-card p {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #64b5f6, #1565c0);
+            color: white;
+            padding: 9px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(66, 165, 245, 0.2);
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(90deg, #42a5f5, #0d47a1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(66, 165, 245, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+        
+        #mainBox .form-group {
+            margin: 12px 0 18px;
+        }
+        
+        #mainBox .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #1565c0 !important;
+            font-weight: 600;
+        }
+        
+        #mainBox .form-group input,
+        #mainBox .form-group select {
+            padding: 10px 15px;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 375px;
+            color: var(--text-primary) !important;
+            background: white !important;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        #mainBox .form-group input:focus,
+        #mainBox .form-group select:focus {
+            outline: none;
+            border-color: #42a5f5;
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2);
+        }
+        
+        /* 表格容器和表格样式增强 */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .table-container:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .data-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--table-border);
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .data-table th {
+            background: var(--table-header); /* 使用纯色背景 */
+            color: white !important;
+            font-weight: 600;
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .data-table th:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, white, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .data-table th:hover:after {
+            opacity: 1;
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--table-row-hover);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #fcfdfe;
+        }
+        
+        .data-table td {
+            color: var(--text-primary) !important;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .table-btn.edit {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .table-btn.edit:hover {
+            background-color: #bbdefb;
+        }
+        
+        .table-btn.delete {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .table-btn.delete:hover {
+            background-color: #ffcdd2;
+        }
+        
+        .table-btn.view {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .table-btn.view:hover {
+            background-color: #c8e6c9;
+        }
+        
+        .table-btn i {
+            margin-right: 4px;
+            font-size: 11px;
+        }
+        
+        .sidebar-item:last-child {
+            margin-top: auto;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #d32f2f);
+            border-left-color: #ffffff;
+        }
+        
+        .sidebar-item:last-child:hover {
+            background: linear-gradient(90deg, #ff5252, #b71c1c);
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .login-decoration {
+                width: 250px;
+                height: 250px;
+                filter: blur(70px);
+            }
+            
+            .login-header h2 { 
+                font-size: 28px; 
+            }
+            
+            .login-container {
+                padding: 40px 30px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .data-table {
+                min-width: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-decoration {
+                width: 200px;
+                height: 200px;
+                filter: blur(60px);
+            }
+            
+            .decoration-1 { 
+                top: -100px; 
+                left: -100px; 
+            }
+            
+            .decoration-2 { 
+                bottom: -100px; 
+                right: -100px; 
+            }
+            
+            .login-header h2 { 
+                font-size: 24px; 
+            }
+            
+            .login-container {
+                padding: 35px 25px;
+            }
+            
+            .sidebar-item {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .module {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .module h2 {
+                font-size: 18px;
+                margin-bottom: 15px;
+                padding-bottom: 8px;
+            }
+            
+            .function-card {
+                padding: 15px;
+                margin: 10px 0 15px;
+            }
+            
+            .function-card h3 {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+            
+            .function-card p {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 13px;
+                width: 100%;
+            }
+            
+            #mainBox .form-group input,
+            #mainBox .form-group select {
+                max-width: 100%;
+                font-size: 14px;
+            }
+            
+            .data-table {
+                min-width: 400px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+            
+            .table-btn {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+            
+            .table-btn span {
+                display: none;
+            }
+            
+            .table-btn i {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 登录层装饰元素 -->
+    <div class="login-decoration decoration-1"></div>
+    <div class="login-decoration decoration-2"></div>
+    
+    <!-- 登录层 -->
+    <div id="loginBox">
+        <div class="login-container">
+            <div class="login-header">
+                <h2>欢迎登录</h2>
+                <p>请输入您的账号和密码</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input id="username" placeholder="请输入用户名" />
+                </div>
+                <div class="form-group">
+                    <label>密　码</label>
+                    <input type="password" id="password" placeholder="请输入密码" />
+                </div>
+                <button type="submit" class="login-button">登 录</button>
+                <div id="errorMsg" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 系统主体层 -->
+    <div id="mainBox">
+        <div class="header">
+            <button class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>人力资源管理系统</h1>
+        </div>
+        <div class="sidebar-mask"></div>
+        <div class="container">
+            <div class="sidebar">
+                <div class="sidebar-item active" onclick="showModule('employee', this)">
+                    <i class="fas fa-user" style="margin-right: 10px;"></i>员工信息管理
+                </div>
+                <div class="sidebar-item" onclick="showModule('salary', this)">
+                    <i class="fas fa-wallet" style="margin-right: 10px;"></i>工资录入管理
+                </div>
+                <div class="sidebar-item" onclick="showModule('attendance', this)">
+                    <i class="fas fa-calendar-check" style="margin-right: 10px;"></i>考勤录入管理
+                </div>
+                <div class="sidebar-item" onclick="showModule('performance', this)">
+                    <i class="fas fa-chart-line" style="margin-right: 10px;"></i>绩效评估管理
+                </div>
+                <div class="sidebar-item" onclick="showModule('training', this)">
+                    <i class="fas fa-graduation-cap" style="margin-right: 10px;"></i>员工培训管理
+                </div>
+                <div class="sidebar-item" onclick="showModule('system', this)">
+                    <i class="fas fa-cog" style="margin-right: 10px;"></i>系统管理
+                </div>
+                <div class="sidebar-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>退出系统
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- 员工信息管理 -->
+                <div id="employee" class="module active">
+                    <h2>员工信息管理模块</h2>
+                    <div class="function-card">
+                        <h3>1. 录入员工信息</h3>
+                        <p>输入员工的基本信息，如姓名、性别、年龄、联系方式、职位、部门等。</p>
+                        <div class="form-group">
+                            <label>姓名：</label>
+                            <input type="text" placeholder="请输入员工姓名" />
+                        </div>
+                        <div class="form-group">
+                            <label>性别：</label>
+                            <select>
+                                <option>男</option>
+                                <option>女</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>年龄：</label>
+                            <input type="number" placeholder="请输入年龄" />
+                        </div>
+                        <div class="form-group">
+                            <label>部门：</label>
+                            <input type="text" placeholder="请输入部门" />
+                        </div>
+                        <div class="form-group">
+                            <label>职位：</label>
+                            <input type="text" placeholder="请输入职位" />
+                        </div>
+                        <button class="btn"><i class="fas fa-save"></i> 保存员工信息</button>
+                    </div>
+
+                    <div class="function-card">
+                        <h3>2. 员工信息列表</h3>
+                        <p>查看、搜索和管理所有员工的信息记录。</p>
+                        <div class="form-group">
+                            <label>查询条件：</label>
+                            <input type="text" placeholder="请输入姓名或部门" />
+                        </div>
+                        <button class="btn"><i class="fas fa-search"></i> 查询</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>姓名</th>
+                                        <th>性别</th>
+                                        <th>年龄</th>
+                                        <th>部门</th>
+                                        <th>职位</th>
+                                        <th>入职日期</th>
+                                        <th>联系电话</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>张三</td>
+                                        <td>男</td>
+                                        <td>28</td>
+                                        <td>技术部</td>
+                                        <td>软件工程师</td>
+                                        <td>2020-03-15</td>
+                                        <td>13800138000</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>002</td>
+                                        <td>李四</td>
+                                        <td>女</td>
+                                        <td>25</td>
+                                        <td>人力资源部</td>
+                                        <td>专员</td>
+                                        <td>2021-05-20</td>
+                                        <td>13900139000</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>003</td>
+                                        <td>王五</td>
+                                        <td>男</td>
+                                        <td>32</td>
+                                        <td>财务部</td>
+                                        <td>经理</td>
+                                        <td>2019-01-10</td>
+                                        <td>13700137000</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>004</td>
+                                        <td>赵六</td>
+                                        <td>男</td>
+                                        <td>35</td>
+                                        <td>市场部</td>
+                                        <td>总监</td>
+                                        <td>2018-08-05</td>
+                                        <td>13600136000</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 工资录入管理 -->
+                <div id="salary" class="module">
+                    <h2>工资录入管理模块</h2>
+                    <div class="function-card">
+                        <h3>1. 录入工资信息</h3>
+                        <p>手动输入员工的工资数据，包括基本工资、奖金、加班费等。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>月份：</label>
+                            <input type="month" />
+                        </div>
+                        <div class="form-group">
+                            <label>基本工资：</label>
+                            <input type="number" placeholder="请输入基本工资" />
+                        </div>
+                        <div class="form-group">
+                            <label>奖金：</label>
+                            <input type="number" placeholder="请输入奖金" />
+                        </div>
+                        <div class="form-group">
+                            <label>加班费：</label>
+                            <input type="number" placeholder="请输入加班费" />
+                        </div>
+                        <div class="form-group">
+                            <label>扣除项：</label>
+                            <input type="number" placeholder="请输入扣除项" />
+                        </div>
+                        <button class="btn"><i class="fas fa-save"></i> 保存工资信息</button>
+                    </div>
+                    <div class="function-card">
+                        <h3>2. 工资信息列表</h3>
+                        <p>查看和管理员工的工资记录。</p>
+                        <div class="form-group">
+                            <label>查询月份：</label>
+                            <input type="month" />
+                        </div>
+                        <button class="btn"><i class="fas fa-search"></i> 查看工资列表</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>员工姓名</th>
+                                        <th>月份</th>
+                                        <th>基本工资</th>
+                                        <th>奖金</th>
+                                        <th>加班费</th>
+                                        <th>扣除项</th>
+                                        <th>实发金额</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>张三</td>
+                                        <td>2023-06</td>
+                                        <td>8000</td>
+                                        <td>1500</td>
+                                        <td>800</td>
+                                        <td>300</td>
+                                        <td>10000</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>002</td>
+                                        <td>李四</td>
+                                        <td>2023-06</td>
+                                        <td>6000</td>
+                                        <td>1000</td>
+                                        <td>200</td>
+                                        <td>150</td>
+                                        <td>7050</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>003</td>
+                                        <td>王五</td>
+                                        <td>2023-06</td>
+                                        <td>12000</td>
+                                        <td>3000</td>
+                                        <td>0</td>
+                                        <td>500</td>
+                                        <td>14500</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 考勤录入管理 -->
+                <div id="attendance" class="module">
+                    <h2>考勤录入管理模块</h2>
+                    <div class="function-card">
+                        <h3>1. 记录考勤</h3>
+                        <p>记录员工的出勤情况，包括出勤、迟到、早退、请假等。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>日期：</label>
+                            <input type="date" />
+                        </div>
+                        <div class="form-group">
+                            <label>考勤状态：</label>
+                            <select>
+                                <option>出勤</option>
+                                <option>迟到</option>
+                                <option>早退</option>
+                                <option>请假</option>
+                                <option>缺勤</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>备注：</label>
+                            <input type="text" placeholder="请输入备注信息（可选）" />
+                        </div>
+                        <button class="btn"><i class="fas fa-save"></i> 记录考勤</button>
+                    </div>
+                    <div class="function-card">
+                        <h3>2. 考勤记录列表</h3>
+                        <p>查看员工的考勤记录，支持按员工和日期范围查询。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option value="">全部员工</option>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>日期范围：</label>
+                            <input type="month" />
+                        </div>
+                        <button class="btn"><i class="fas fa-search"></i> 查看考勤记录</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>员工姓名</th>
+                                        <th>日期</th>
+                                        <th>考勤状态</th>
+                                        <th>签到时间</th>
+                                        <th>签退时间</th>
+                                        <th>备注</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>张三</td>
+                                        <td>2023-06-01</td>
+                                        <td>出勤</td>
+                                        <td>09:00</td>
+                                        <td>18:00</td>
+                                        <td>-</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>002</td>
+                                        <td>张三</td>
+                                        <td>2023-06-02</td>
+                                        <td>迟到</td>
+                                        <td>09:30</td>
+                                        <td>18:00</td>
+                                        <td>交通原因</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>003</td>
+                                        <td>李四</td>
+                                        <td>2023-06-01</td>
+                                        <td>出勤</td>
+                                        <td>08:50</td>
+                                        <td>17:55</td>
+                                        <td>-</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>004</td>
+                                        <td>王五</td>
+                                        <td>2023-06-01</td>
+                                        <td>请假</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>事假</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 绩效评估管理 -->
+                <div id="performance" class="module">
+                    <h2>绩效评估管理模块</h2>
+                    <div class="function-card">
+                        <h3>1. 录入绩效评估</h3>
+                        <p>输入员工的绩效评估结果，如绩效等级、评分等。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>评估周期：</label>
+                            <select>
+                                <option>2023年第一季度</option>
+                                <option>2023年第二季度</option>
+                                <option>2023年第三季度</option>
+                                <option>2023年第四季度</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>绩效等级：</label>
+                            <select>
+                                <option>优秀</option>
+                                <option>良好</option>
+                                <option>合格</option>
+                                <option>待改进</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>评分：</label>
+                            <input type="number" placeholder="请输入评分（0-100）" />
+                        </div>
+                        <div class="form-group">
+                            <label>评估意见：</label>
+                            <input type="text" placeholder="请输入评估意见" />
+                        </div>
+                        <button class="btn"><i class="fas fa-save"></i> 保存绩效评估</button>
+                    </div>
+                    <div class="function-card">
+                        <h3>2. 绩效评估列表</h3>
+                        <p>查看员工的绩效评估结果，支持按员工和评估周期查询。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option value="">全部员工</option>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>评估周期：</label>
+                            <select>
+                                <option>2023年第一季度</option>
+                                <option>2023年第二季度</option>
+                                <option>2023年第三季度</option>
+                                <option>2023年第四季度</option>
+                            </select>
+                        </div>
+                        <button class="btn"><i class="fas fa-search"></i> 查看绩效列表</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>员工姓名</th>
+                                        <th>评估周期</th>
+                                        <th>绩效等级</th>
+                                        <th>评分</th>
+                                        <th>评估人</th>
+                                        <th>评估日期</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>张三</td>
+                                        <td>2023年第二季度</td>
+                                        <td>优秀</td>
+                                        <td>92</td>
+                                        <td>技术部经理</td>
+                                        <td>2023-06-30</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>002</td>
+                                        <td>李四</td>
+                                        <td>2023年第二季度</td>
+                                        <td>良好</td>
+                                        <td>85</td>
+                                        <td>人力资源总监</td>
+                                        <td>2023-06-30</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>003</td>
+                                        <td>王五</td>
+                                        <td>2023年第二季度</td>
+                                        <td>良好</td>
+                                        <td>88</td>
+                                        <td>财务总监</td>
+                                        <td>2023-06-29</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 员工培训管理 -->
+                <div id="training" class="module">
+                    <h2>员工培训管理模块</h2>
+                    <div class="function-card">
+                        <h3>1. 录入培训情况</h3>
+                        <p>记录员工参加的培训课程、培训时间、培训效果评估等。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>培训课程：</label>
+                            <input type="text" placeholder="请输入培训课程名称" />
+                        </div>
+                        <div class="form-group">
+                            <label>培训开始时间：</label>
+                            <input type="date" />
+                        </div>
+                        <div class="form-group">
+                            <label>培训结束时间：</label>
+                            <input type="date" />
+                        </div>
+                        <div class="form-group">
+                            <label>培训讲师：</label>
+                            <input type="text" placeholder="请输入培训讲师" />
+                        </div>
+                        <div class="form-group">
+                            <label>培训效果：</label>
+                            <select>
+                                <option>优秀</option>
+                                <option>良好</option>
+                                <option>一般</option>
+                                <option>较差</option>
+                            </select>
+                        </div>
+                        <button class="btn"><i class="fas fa-save"></i> 保存培训记录</button>
+                    </div>
+                    <div class="function-card">
+                        <h3>2. 培训记录列表</h3>
+                        <p>查看员工的培训记录，支持按员工和时间查询。</p>
+                        <div class="form-group">
+                            <label>员工姓名：</label>
+                            <select>
+                                <option value="">全部员工</option>
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                                <option>赵六</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>培训时间：</label>
+                            <input type="month" />
+                        </div>
+                        <button class="btn"><i class="fas fa-search"></i> 查看培训记录</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>员工姓名</th>
+                                        <th>培训课程</th>
+                                        <th>开始时间</th>
+                                        <th>结束时间</th>
+                                        <th>培训讲师</th>
+                                        <th>培训效果</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>张三</td>
+                                        <td>新员工入职培训</td>
+                                        <td>2023-06-01</td>
+                                        <td>2023-06-02</td>
+                                        <td>人力资源部</td>
+                                        <td>良好</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>002</td>
+                                        <td>张三</td>
+                                        <td>软件开发新技术培训</td>
+                                        <td>2023-06-15</td>
+                                        <td>2023-06-16</td>
+                                        <td>技术总监</td>
+                                        <td>优秀</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>003</td>
+                                        <td>李四</td>
+                                        <td>人力资源管理培训</td>
+                                        <td>2023-06-10</td>
+                                        <td>2023-06-12</td>
+                                        <td>外部专家</td>
+                                        <td>优秀</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="function-card">
+                        <h3>3. 培训统计</h3>
+                        <p>统计员工的培训次数、培训时长等信息。</p>
+                        <button class="btn"><i class="fas fa-chart-pie"></i> 查看培训统计</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>员工姓名</th>
+                                        <th>部门</th>
+                                        <th>培训次数</th>
+                                        <th>总培训时长(天)</th>
+                                        <th>最近培训时间</th>
+                                        <th>平均培训效果</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>张三</td>
+                                        <td>技术部</td>
+                                        <td>5</td>
+                                        <td>8</td>
+                                        <td>2023-06-16</td>
+                                        <td>良好</td>
+                                    </tr>
+                                    <tr>
+                                        <td>李四</td>
+                                        <td>人力资源部</td>
+                                        <td>3</td>
+                                        <td>6</td>
+                                        <td>2023-06-12</td>
+                                        <td>优秀</td>
+                                    </tr>
+                                    <tr>
+                                        <td>王五</td>
+                                        <td>财务部</td>
+                                        <td>2</td>
+                                        <td>4</td>
+                                        <td>2023-05-20</td>
+                                        <td>良好</td>
+                                    </tr>
+                                    <tr>
+                                        <td>赵六</td>
+                                        <td>市场部</td>
+                                        <td>4</td>
+                                        <td>5</td>
+                                        <td>2023-06-05</td>
+                                        <td>良好</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统管理 -->
+                <div id="system" class="module">
+                    <h2>系统管理模块</h2>
+                    <div class="function-card">
+                        <h3>1. 用户管理</h3>
+                        <p>添加、删除和修改用户账户，分配用户权限。</p>
+                        <div class="form-group">
+                            <label>用户名：</label>
+                            <input type="text" placeholder="请输入用户名" />
+                        </div>
+                        <div class="form-group">
+                            <label>密码：</label>
+                            <input type="password" placeholder="请输入密码" />
+                        </div>
+                        <div class="form-group">
+                            <label>用户权限：</label>
+                            <select>
+                                <option>管理员</option>
+                                <option>普通用户</option>
+                                <option>只读用户</option>
+                            </select>
+                        </div>
+                        <button class="btn"><i class="fas fa-plus"></i> 添加用户</button>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>用户名</th>
+                                        <th>权限等级</th>
+                                        <th>创建时间</th>
+                                        <th>最后登录时间</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>admin</td>
+                                        <td>管理员</td>
+                                        <td>2023-01-01</td>
+                                        <td>2023-06-30 15:30</td>
+                                        <td>正常</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>002</td>
+                                        <td>hr_user</td>
+                                        <td>普通用户</td>
+                                        <td>2023-02-15</td>
+                                        <td>2023-06-29 10:15</td>
+                                        <td>正常</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>003</td>
+                                        <td>viewer</td>
+                                        <td>只读用户</td>
+                                        <td>2023-03-20</td>
+                                        <td>2023-06-28 09:45</td>
+                                        <td>正常</td>
+                                        <td class="table-actions">
+                                            <button class="table-btn view"><i class="fas fa-eye"></i><span>查看</span></button>
+                                            <button class="table-btn edit"><i class="fas fa-edit"></i><span>编辑</span></button>
+                                            <button class="table-btn delete"><i class="fas fa-trash"></i><span>删除</span></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="function-card">
+                        <h3>2. 系统设置</h3>
+                        <p>设置基本的系统参数，如工资计算规则等。</p>
+                        <div class="form-group">
+                            <label>基本工资计算规则：</label>
+                            <input type="text" placeholder="请输入基本工资计算规则" value="月薪/22*实际出勤天数" />
+                        </div>
+                        <div class="form-group">
+                            <label>加班工资计算规则：</label>
+                            <input type="text" placeholder="请输入加班工资计算规则" value="时薪*加班小时数*1.5（工作日）/2（周末）/3（法定假日）" />
+                        </div>
+                        <div class="form-group">
+                            <label>绩效评估周期：</label>
+                            <select>
+                                <option>每月</option>
+                                <option selected>每季度</option>
+                                <option>每半年</option>
+                                <option>每年</option>
+                            </select>
+                        </div>
+                        <button class="btn"><i class="fas fa-save"></i> 保存设置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 登录逻辑
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            
+            // 清除之前的错误信息
+            errorMsg.textContent = '';
+            
+            // 验证输入
+            if (!u && !p) {
+                errorMsg.textContent = '请输入用户名和密码';
+                return;
+            } else if (!u) {
+                errorMsg.textContent = '请输入用户名';
+                return;
+            } else if (!p) {
+                errorMsg.textContent = '请输入密码';
+                return;
+            }
+            
+            // 登录成功
+            localStorage.setItem('uid', u);
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('mainBox').style.display = 'block';
+            
+            // 修复body样式冲突
+            document.body.style.height = 'auto';
+            document.body.style.background = 'var(--main-bg)';
+            document.body.style.backgroundSize = 'auto';
+            document.body.style.animation = 'none';
+            
+            // 移除装饰元素
+            document.querySelectorAll('.login-decoration').forEach(el => {
+                el.style.display = 'none';
+            });
+        });
+
+        // 侧边栏切换功能
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarMask = document.querySelector('.sidebar-mask');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarMask.classList.toggle('active');
+        }
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarMask.addEventListener('click', toggleSidebar);
+        }
+
+        function showModule(moduleId, element) {
+            // 隐藏所有模块
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            // 移除所有侧边栏项的active类
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            // 显示选中模块并激活对应侧边栏项
+            document.getElementById(moduleId).classList.add('active');
+            element.classList.add('active');
+            
+            // 重置主内容区域滚动位置
+            document.querySelector('.main-content').scrollTop = 0;
+            
+            // 移动端自动隐藏侧边栏
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                sidebarMask.classList.remove('active');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('uid');
+            document.getElementById('mainBox').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'block';
+            document.getElementById('loginForm').reset();
+            
+            // 恢复登录页样式
+            document.body.style.height = '100vh';
+            document.body.style.background = 'linear-gradient(135deg, #e0f7fa, #bbdefb, #90caf9, #42a5f5, #1e88e5)';
+            document.body.style.backgroundSize = '400% 400%';
+            document.body.style.animation = 'gradientBG 15s ease infinite';
+            
+            // 恢复装饰元素
+            document.querySelectorAll('.login-decoration').forEach(el => {
+                el.style.display = 'block';
+            });
+        }
+        
+        // 窗口大小变化时处理
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebarMask.classList.remove('active');
+            }
+        });
+        
+        // 确保登录框宽度在窗口大小改变时正确刷新
+        window.addEventListener('resize', function() {
+            const loginContainer = document.querySelector('.login-container');
+            if (loginContainer) {
+                // 触发重绘
+                loginContainer.style.display = 'none';
+                setTimeout(() => {
+                    loginContainer.style.display = '';
+                }, 10);
+            }
+        });
+        
+        // 表格按钮点击效果
+        document.querySelectorAll('.table-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.classList.contains('edit') ? '编辑' : 
+                              this.classList.contains('delete') ? '删除' : '查看';
+                const itemName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
+                alert(`您点击了${action}按钮，操作对象：${itemName}`);
+            });
+        });
+    </script>
+</body>
+</html>
